@@ -40,12 +40,15 @@ export class AppComponent implements OnInit {
   }
 
   recieveVideoCall() {
+    const video = this.videoStream.nativeElement;
     console.log('Inside Recieved call');
     navigator.getUserMedia = navigator.getUserMedia;  /* || navigator.webkitGetUserMedia || navigator.mozGetUserMedia; */
     this.peer.on('call', (call) => {
       navigator.getUserMedia({ video: true, audio: true }, (stream) => {
         call.answer(stream); // Answer the call with an A/V stream.
         call.on('stream', (remoteStream) => {
+          video.srcObject = remoteStream;
+          video.play();
           // Show stream in some video/canvas element.
         });
       }, (err) => {
