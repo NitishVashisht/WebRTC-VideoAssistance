@@ -12,7 +12,7 @@ declare var Peer: any;
 export class AppComponent implements OnInit {
   title = 'peerclientA';
   @ViewChild('videoStream') videoStream: any;
-  id = 'peerclientA'; // for a time being we are providing peer id but in future we would need to use node server to create peer id for us
+  id = 'peerclientB'; // for a time being we are providing peer id but in future we would need to use node server to create peer id for us
   peer;
   option = {
     host: 'localhost',
@@ -28,15 +28,24 @@ export class AppComponent implements OnInit {
     console.log('videocallToClient video Call pressed');
     const video = this.videoStream.nativeElement;
     navigator.getUserMedia = navigator.getUserMedia;
-    navigator.getUserMedia({ video: true, audio: true }, (stream) => {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true}).then( (stream) => {
       const call = this.peer.call('peerclientB', stream);
       call.on('stream', (remoteStream) => {
         video.srcObject = remoteStream;
         video.play();
       });
-    }, (err) => {
+    }, err => {
       console.log('Failed to get local stream', err);
     });
+    // navigator.getUserMedia({ video: true, audio: true }, (stream) => {
+    //   const call = this.peer.call('peerclientB', stream);
+    //   call.on('stream', (remoteStream) => {
+    //     video.srcObject = remoteStream;
+    //     video.play();
+    //   });
+    // }, (err) => {
+    //   console.log('Failed to get local stream', err);
+    // });
   }
 
   recieveVideoCall() {
@@ -44,7 +53,7 @@ export class AppComponent implements OnInit {
     console.log('Inside Recieved call');
     navigator.getUserMedia = navigator.getUserMedia;  /* || navigator.webkitGetUserMedia || navigator.mozGetUserMedia; */
     this.peer.on('call', (call) => {
-      navigator.getUserMedia({ video: true, audio: true }, (stream) => {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
         call.answer(stream); // Answer the call with an A/V stream.
         call.on('stream', (remoteStream) => {
           video.srcObject = remoteStream;
